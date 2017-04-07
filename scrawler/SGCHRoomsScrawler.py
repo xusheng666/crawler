@@ -3,12 +3,13 @@ Created on 19 Jul 2016
 
 @author: xusheng
 '''
+
 import requests
 from bs4 import BeautifulSoup
 
 from entities.RoomMasterBO import RoomMaster
-from persistence import MySQLHelper, MongoHelper
-from util import EnumUtil
+from persistence import MongoHelper
+
 
 class SGRoomScrawler(object):
     '''
@@ -19,6 +20,35 @@ class SGRoomScrawler(object):
         '''
         Constructor
         '''
+
+    def populateMasterRoomDetail(self, rmid, url):
+        dictdtl = []
+        print(url)
+        try:
+            rdtl = requests.get(url)
+            soupDtl = BeautifulSoup(rdtl.content, 'html.parser')
+            for rentalDtl in soupDtl.find_all("div", class_="typeoption"):
+                index = 0;
+
+                for item in rentalDtl.find_all("tr"):
+                    title = item.find("th");
+                    value = item.find("td");
+
+                    if index == 13:
+                        continue;
+                    # print(title.text,value.text)
+                    dictdtl.append(title.text + ":" + value.text);
+                    print(index)
+                    index = index + 1;
+                # print dictdtl
+                helper = MongoHelper.MongoHelper(object)
+                # dictJson = json.dumps(dictdtl);
+                # print dictJson;
+                helper.InsertDetailRecord({"RMID": rmid});
+                helper.UpdateDetailRecord(rmid, dictdtl);
+        except Exception:
+            print "got error"
+
     def populateMasterRooms(self):
         # get the master rooms records
         r = requests.get('http://bbs.sgcn.com/forum-1231-1.html')
@@ -62,12 +92,10 @@ class SGRoomScrawler(object):
                 # MongoHelper.InsertRecords(roomList)
                 helper = MongoHelper.MongoHelper(object)
                 helper.InsertRecord(dict);
+                print(masterBO.url)
+                self.populateMasterRoomDetail(index, masterBO.url)
                 print('insert to DB success!')
 
             print('=============================='+str(index))
 
             index = index + 1
-
-    def populateMasterRoomDetail(url):
-        rdtl = requests.get(url)
-        soupDtl = BeautifulSoup(rdtl.content, 'html.parser')

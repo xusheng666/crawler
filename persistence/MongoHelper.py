@@ -30,5 +30,11 @@ class MongoHelper(object):
         for dict in dictList:
             MongoHelper.db.rentrooms.insert(dict)
 
+    def InsertDetailRecord(self, dict):
+        MongoHelper.db.rentroomdetail.insert(dict)
+
+    def UpdateDetailRecord(self, rmid, dictdtl):
+        MongoHelper.db.rentroomdetail.update({'RMID': rmid}, {'$push': {'roominfo_list': {'$each': dictdtl}}})
+
     def QueryRecord(self):
         return MongoHelper.db.rentrooms;
