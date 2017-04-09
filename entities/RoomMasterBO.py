@@ -9,8 +9,8 @@ class RoomMaster():
     classdocs
     '''
     # below are the properties
-        
-    def __init__(self, rid, title, url, mrt):
+
+    def __init__(self, rid, title, url, mrt, publishtime):
         '''
         Constructor
         '''
@@ -18,3 +18,4 @@ class RoomMaster():
         self.title = title;
         self.url = url;
         self.mrt = mrt;
+        self.publishtime = publishtime;
